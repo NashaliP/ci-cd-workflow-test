@@ -6,10 +6,10 @@ const PORT = process.env.PORT || 8000;
 const server = http.createServer(app);
 
 app.get("/",(req,res)=>{
-    res.send("Hello World!");
+    res.send("Hello World!Welcome!");
 })
 
 server.listen(PORT,()=>{
-    console.log(`server running on port: ${PORT}`);
+    console.log(`Server is now running on port: ${PORT}`);
 })
 
