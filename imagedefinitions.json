@@ -1,0 +1,6 @@
+[
+    {
+      "name": "github-sample",
+      "imageUri": "211125636620.dkr.ecr.ap-south-1.amazonaws.com/test-deploy:latest"
+    }
+  ]
