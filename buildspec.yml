@@ -38,7 +38,7 @@ phases:
       # - command
   post_build:
     commands:
-      - printf '[{"name":"github-sample","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > imagedefinitions.json
+      - printf '[{"name":"test-deploy","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > imagedefinitions.json
       - cat imagedefinitions.json
       # - command
 artifacts:
