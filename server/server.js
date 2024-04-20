@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 80;
 const server = http.createServer(app);
 
 app.get("/",(req,res)=>{
-    res.send("Hello World! brinjals and peaches who drink anlene");
+    res.send("Hello World! b lasagne - chanux modai");
 })
 
 server.listen(PORT,()=>{
