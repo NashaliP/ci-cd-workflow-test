@@ -4,7 +4,7 @@
         {
             "name": "github-sample",
             "image": "211125636620.dkr.ecr.us-east-1.amazonaws.com/github-sample:sample_image",
-            "cpu": 0,
+            "cpu": 1,
             "portMappings": [
                 {
                     "name": "github-sample-80-tcp",
