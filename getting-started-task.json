@@ -1,5 +1,5 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-south-1:211125636620:task-definition/getting-started-task:2",
+    "taskDefinitionArn": "arn:aws:ecs:ap-south-1:211125636620:task-definition/getting-started-task",
     "containerDefinitions": [
         {
             "name": "github-sample",
