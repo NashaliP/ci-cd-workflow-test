@@ -10,8 +10,7 @@ env:
   ECR_REPOSITORY: test-deploy           # set this to your Amazon ECR repository name
   ECS_SERVICE: express-backend-service                # set this to your Amazon ECS service name
   ECS_CLUSTER: getting-started-app                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: getting-started-task.json # set this to the path to your Amazon ECS task definition
-                                               # file, e.g. .aws/task-definition.json
+  ECS_TASK_DEFINITION: getting-started-task.json # set this to the path to your Amazon ECS task definition                                          # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: github-sample           # set this to the name of the container in the
 jobs:
   deploy:
@@ -51,7 +50,7 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-create-task-definition@v2
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}.green
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
