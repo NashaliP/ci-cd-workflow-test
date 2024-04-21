@@ -17,7 +17,7 @@ env:
   CONTAINER_NAME: github-sample 
 
 jobs:
-  sonarcloud:
+ sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
     steps:
