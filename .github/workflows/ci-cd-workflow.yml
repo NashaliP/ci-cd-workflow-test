@@ -1,5 +1,4 @@
-
-name: Deploy to Amazon ECS
+name: CI-CD
 
 on:
   push:
@@ -7,31 +6,37 @@ on:
       - main
 
 env:
-  AWS_REGION: ap-south-1                      # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: test-deploy           # set this to your Amazon ECR repository name
-  ECS_SERVICE: express-backend-service                # set this to your Amazon ECS service name
-  ECS_CLUSTER: getting-started-app                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: getting-started-task.json # set this to the path to your Amazon ECS task definition
-                                               # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: github-sample           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
+  AWS_REGION: ap-south-1                      
+  ECR_REPOSITORY: test-deploy           
+  ECS_SERVICE: express-backend-service                
+  ECS_CLUSTER: getting-started-app                 
+  ECS_TASK_DEFINITION: getting-started-task.json 
+  CONTAINER_NAME: github-sample 
 
 jobs:
-  deploy:
-    name: Deploy
+  sonarcloud:
+    name: SonarCloud Scan
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  build_and_push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: sonarcloud
     environment: production
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -43,12 +48,23 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          # Build a docker container and
-          # push it to ECR so that it can
-          # be deployed to ECS.
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  deploy_to_ecs:
+    name: Deploy to Amazon ECS
+    runs-on: ubuntu-latest
+    needs: build_and_push
+    environment: production
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
@@ -56,7 +72,7 @@ jobs:
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.build-image.outputs.image }}
+          image: ${{ needs.build_and_push.outputs.IMAGE_TAG }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
