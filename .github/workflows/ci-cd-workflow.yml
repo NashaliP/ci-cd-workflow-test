@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types: [opened, synchronize, reopened]
 
 
 env:
@@ -17,8 +15,9 @@ env:
   CONTAINER_NAME: github-sample 
 
 jobs:
- sonarcloud:
+  sonarcloud:
     name: SonarCloud
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
