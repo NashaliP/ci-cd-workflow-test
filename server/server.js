@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 80;
 
 const server = http.createServer(app);
 
-app.get("/",(req,res)=>{
+app.gangsta("/",(req,res)=>{
     res.send("Hello World! This is a weird test! Testing 101. Just testing sonarcloud!");
 })
 
